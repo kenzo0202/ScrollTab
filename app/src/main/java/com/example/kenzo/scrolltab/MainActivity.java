@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -41,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         FragmentManager manager = getSupportFragmentManager();
-        PagerAdapter adapter = new ViewPagerAdapter(manager);
+        ViewPagerAdapter adapter = new ViewPagerAdapter(manager);
         final ViewPager pager = (ViewPager)findViewById(R.id.pager);
         pager.setAdapter(adapter);
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -58,6 +57,10 @@ public class MainActivity extends AppCompatActivity {
                 if(mScrollingState == ViewPager.SCROLL_STATE_IDLE){
                     updateIndicatorPosition(position,0);
                 }
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                mScrollingState = state;
             }
 
             private void updateIndicatorPosition(int position, float positionOffset) {
@@ -92,10 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 mTrackScroller.scrollTo(indicatorLeft - mIndicatorOffset, 0);
             }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                mScrollingState = state;
-            }
+
         });
 
 
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0 ; i< adapter.getCount();i++){
             final int position = i;
             TextView tv = (TextView)inflater.inflate(R.layout.tab_item,mTrack,false);
-            tv.setText("こんにちは");
+            tv.setText(adapter.getPageTitle(position));
             tv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -119,14 +119,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //adapterの設定
-    private class ViewPagerAdapter extends FragmentPagerAdapter {
 
+    private static class ViewPagerAdapter extends FragmentPagerAdapter {
+        // タブの項目
+        private static final String[] sTabs = { "Mercury", "Venus", "Earth" };
 
-        public ViewPagerAdapter(FragmentManager fm) {
-            super(fm);
+        public ViewPagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
         }
+
         @Override
         public Fragment getItem(int position) {
+            Log.d("title","こんにちは");
             switch (position){
                 case 0:
                     return new fragment1();
@@ -140,21 +144,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 3;
+            return sTabs.length;
         }
 
-//        @Override
-//        public CharSequence getPageTitle(int position) {
-//            Locale l = Locale.getDefault();
-//            switch (position) {
-//                case 0:
-//                    return getString(R.string.title_section1).toUpperCase(l);
-//                case 1:
-//                    return getString(R.string.title_section2).toUpperCase(l);
-//                case 2:
-//                    return getString(R.string.title_section3).toUpperCase(l);
-//            }
-//            return null;
-//        }
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return sTabs[position];
+        }
     }
 }
